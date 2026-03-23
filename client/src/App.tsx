@@ -12,7 +12,7 @@ function App() {
   const cartItemsCount = useCartStore((state) => state.items.reduce((acc, item) => acc + item.quantity, 0));
 
   return (
-    <Router>
+    <Router basename={import.meta.env.BASE_URL}>
       <header className="glass-header">
         <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Link to="/" style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>

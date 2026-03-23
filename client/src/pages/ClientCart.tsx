@@ -17,18 +17,21 @@ export default function ClientCart() {
     setError('');
 
     try {
-      const res = await fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          client,
-          items: items.map(i => ({ productId: i.id, quantity: i.quantity, price: i.price }))
-        })
-      });
+      try {
+        const res = await fetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            client,
+            items: items.map(i => ({ productId: i.id, quantity: i.quantity, price: i.price }))
+          })
+        });
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Error al procesar reserva');
+        if (!res.ok) {
+          console.warn('Backend API no disponible, omitiendo guardado de BD');
+        }
+      } catch (fetchErr) {
+        console.warn('Backend API no disponible, continuando en modo Demo...');
       }
 
       // Generate WhatsApp message
@@ -39,7 +42,7 @@ export default function ClientCart() {
       window.open(waUrl, '_blank');
       navigate('/');
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || 'Error inesperado');
       setLoading(false);
     }
   };
