@@ -26,7 +26,18 @@ export default function AdminProducts() {
         setLoading(false);
       })
       .catch(() => {
-        setProducts([]);
+        const localData = localStorage.getItem('demo_products');
+        if (localData) {
+          setProducts(JSON.parse(localData));
+        } else {
+          const initialMock = [
+            { id: '1', name: 'Producto Demo 1', description: 'Descripción de prueba para visualizar el diseño en Github Pages', price: 1500, stockQuantity: 10 },
+            { id: '2', name: 'Producto Demo 2', description: 'Este producto simula no tener stock', price: 3200, stockQuantity: 0 },
+            { id: '3', name: 'Producto Demo 3', description: 'Otro producto de prueba', price: 950, stockQuantity: 5 },
+          ];
+          localStorage.setItem('demo_products', JSON.stringify(initialMock));
+          setProducts(initialMock);
+        }
         setLoading(false);
       });
   };
@@ -54,8 +65,9 @@ export default function AdminProducts() {
       fetchProducts();
     } catch (err) {
       console.warn("Usando mock mode porque la API falló");
+      let updatedProducts;
       if (isEditing) {
-        setProducts(products.map(p => p.id === isEditing ? { ...p, ...formData, price: Number(formData.price), stockQuantity: Number(formData.stockQuantity) } : p));
+        updatedProducts = products.map(p => p.id === isEditing ? { ...p, ...formData, price: Number(formData.price), stockQuantity: Number(formData.stockQuantity) } : p);
       } else {
         const newProduct = {
           id: String(Date.now()),
@@ -63,8 +75,10 @@ export default function AdminProducts() {
           price: Number(formData.price),
           stockQuantity: Number(formData.stockQuantity)
         } as Product;
-        setProducts([...products, newProduct]);
+        updatedProducts = [...products, newProduct];
       }
+      setProducts(updatedProducts);
+      localStorage.setItem('demo_products', JSON.stringify(updatedProducts));
     }
 
     setFormData({ name: '', description: '', price: 0, stockQuantity: 0 });
@@ -78,7 +92,9 @@ export default function AdminProducts() {
       if (!res.ok) throw new Error('API Falló');
       fetchProducts();
     } catch (err) {
-      setProducts(products.filter(p => p.id !== id));
+      const updatedProducts = products.filter(p => p.id !== id);
+      setProducts(updatedProducts);
+      localStorage.setItem('demo_products', JSON.stringify(updatedProducts));
     }
   };
 
