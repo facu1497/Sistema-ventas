@@ -10,9 +10,21 @@ export default function ClientPortal() {
 
   useEffect(() => {
     fetch('/api/products')
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error('API no disponible');
+        return res.json();
+      })
       .then((data) => {
         setProducts(data);
+        setLoading(false);
+      })
+      .catch(() => {
+        // Fallback mock data for GitHub pages UI testing
+        setProducts([
+          { id: '1', name: 'Producto Demo 1', description: 'Descripción de prueba para visualizar el diseño en Github Pages', price: 1500, stockQuantity: 10 },
+          { id: '2', name: 'Producto Demo 2', description: 'Este producto simula no tener stock', price: 3200, stockQuantity: 0 },
+          { id: '3', name: 'Producto Demo 3', description: 'Otro producto de prueba', price: 950, stockQuantity: 5 },
+        ]);
         setLoading(false);
       });
   }, []);

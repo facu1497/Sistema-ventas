@@ -17,9 +17,16 @@ export default function AdminProducts() {
   const fetchProducts = () => {
     setLoading(true);
     fetch('/api/products')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error('API no disponible')
+        return res.json()
+      })
       .then(data => {
         setProducts(data);
+        setLoading(false);
+      })
+      .catch(() => {
+        setProducts([]);
         setLoading(false);
       });
   };
